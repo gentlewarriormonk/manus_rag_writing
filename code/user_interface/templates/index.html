@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Writing Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>RAG Writing Assistant</h1>
+            <p class="subtitle">Your personal writing assistant that captures your authentic voice</p>
+        </header>
+
+        <div class="status-bar" id="status-bar">
+            <div class="status-message" id="status-message">
+                {% if initialization_status.status == "complete" %}
+                    <span class="status-complete">✓</span> {{ initialization_status.message }}
+                {% elif initialization_status.status == "error" %}
+                    <span class="status-error">✗</span> {{ initialization_status.message }}
+                {% else %}
+                    <span class="status-loading">⟳</span> {{ initialization_status.message }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h2>Corpus Management</h2>
+                    <div class="corpus-stats" id="corpus-stats">
+                        {% if corpus_stats %}
+                            <p><strong>Files:</strong> {{ corpus_stats.corpus_files }}</p>
+                            <p><strong>Text Chunks:</strong> {{ corpus_stats.vector_documents }}</p>
+                            <div class="content-types">
+                                <p><strong>Content Types:</strong></p>
+                                <ul>
+                                    {% for type, count in corpus_stats.content_types.items() %}
+                                        <li>{{ type }}: {{ count }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% else %}
+                            <p>No corpus statistics available</p>
+                        {% endif %}
+                    </div>
+                    <div class="file-upload">
+                        <h3>Upload Text File</h3>
+                        <form id="upload-form" enctype="multipart/form-data">
+                            <div class="file-input-container">
+                                <input type="file" id="file-input" name="file" accept=".txt">
+                                <label for="file-input" class="file-input-label">Choose File</label>
+                                <span id="file-name">No file chosen</span>
+                            </div>
+                            <button type="submit" class="button">Upload</button>
+                        </form>
+                        <div class="upload-status" id="upload-status"></div>
+                    </div>
+                    <div class="corpus-actions">
+                        <button id="reprocess-button" class="button secondary">Reprocess Corpus</button>
+                        <div id="reprocess-status"></div>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <h2>Help</h2>
+                    <div class="help-content">
+                        <h3>File Naming Tips</h3>
+                        <p>For best results, name your files with content type and tags:</p>
+                        <code>Essay - Title [tag1, tag2].txt</code>
+                        <p>Supported content types:</p>
+                        <ul>
+                            <li>Essay</li>
+                            <li>Reflection</li>
+                            <li>Podcast</li>
+                            <li>Substack/Newsletter</li>
+                        </ul>
+                        <h3>Style Adjustments</h3>
+                        <p>Add style instructions in your prompt:</p>
+                        <ul>
+                            <li>"make this more humorous"</li>
+                            <li>"make this more formal"</li>
+                            <li>"make this more concise"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="input-section">
+                    <h2>Generate Content in Your Style</h2>
+                    <div class="input-container">
+                        <textarea id="query-input" placeholder="Enter your request (e.g., 'Write a short essay about artificial intelligence' or 'Draft a podcast intro about climate change [make this more conversational]')"></textarea>
+                        <div class="style-adjustments">
+                            <label for="style-dropdown">Style Adjustment:</label>
+                            <select id="style-dropdown">
+                                <option value="">None</option>
+                                <option value="make this more formal">More Formal</option>
+                                <option value="make this more conversational">More Conversational</option>
+                                <option value="make this more humorous">More Humorous</option>
+                                <option value="make this more technical">More Technical</option>
+                                <option value="make this more concise">More Concise</option>
+                                <option value="make this more detailed">More Detailed</option>
+                            </select>
+                        </div>
+                        <button id="generate-button" class="button primary">Generate</button>
+                    </div>
+                </div>
+
+                <div class="output-section">
+                    <div class="output-header">
+                        <h2>Generated Content</h2>
+                        <button id="copy-button" class="button small" disabled>Copy</button>
+                    </div>
+                    <div class="output-container">
+                        <div id="output-content" class="output-content">
+                            <p class="placeholder">Your generated content will appear here...</p>
+                        </div>
+                        <div id="loading-indicator" class="loading-indicator hidden">
+                            <div class="spinner"></div>
+                            <p>Generating content...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>RAG Writing Assistant &copy; 2025 | Built with LangChain, ChromaDB, and Flask</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
