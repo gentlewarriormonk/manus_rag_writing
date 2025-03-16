@@ -16,18 +16,28 @@ import time
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Get the absolute path to the project root (the directory containing rag_code/)
+# Get the absolute path to the project root (parent directory of rag_code)
 current_file_path = Path(__file__).resolve()
-project_root = current_file_path.parent.parent.parent  # Adjust this based on your file location
+project_root = current_file_path.parent.parent.parent  # This should point to the directory containing rag_code/
 
 # Add the project root to the Python path
-sys.path.append(str(project_root))
+sys.path.insert(0, str(project_root))
 
 # Print debug information to help troubleshoot
 logger.info(f"Current file path: {current_file_path}")
 logger.info(f"Project root path: {project_root}")
 logger.info(f"Python path: {sys.path}")
+
+# List the contents of the project root for debugging
 logger.info(f"Directory contents of project root: {os.listdir(project_root)}")
+
+# Check if rag_code directory exists in the project root
+rag_code_dir = project_root / "rag_code"
+if rag_code_dir.exists():
+    logger.info(f"rag_code directory found: {rag_code_dir}")
+    logger.info(f"rag_code directory contents: {os.listdir(rag_code_dir)}")
+else:
+    logger.error(f"rag_code directory not found at {rag_code_dir}")
 
 # Now try to import the RAG assistant
 try:
@@ -37,11 +47,17 @@ except ImportError as e:
     logger.error(f"Failed to import RAGWritingAssistant: {str(e)}")
     # Try an alternative import approach
     try:
-        sys.path.append(str(current_file_path.parent.parent))
+        # If we're in the rag_code/deployment directory, the parent is rag_code
+        sys.path.insert(0, str(current_file_path.parent.parent))
         from rag_assistant import RAGWritingAssistant
         logger.info("Successfully imported RAGWritingAssistant using alternative path")
     except ImportError as e2:
         logger.error(f"Alternative import also failed: {str(e2)}")
+        st.error("""
+        **Error: Could not import RAGWritingAssistant module.**
+        
+        This is likely due to a path configuration issue. Please check the console logs.
+        """)
 
 # Constants
 DEFAULT_CORPUS_DIR = os.path.join(project_root, "corpus")
@@ -115,6 +131,8 @@ def initialize_assistant():
         st.session_state.initialization_status = "error"
         logger.error(f"Error initializing RAG assistant: {error_msg}")
         st.error(f"Error initializing system: {error_msg}")
+
+# Rest of the file remains the same...
 
 def upload_file(uploaded_file):
     """Upload and process a file"""
