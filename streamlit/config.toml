@@ -1,0 +1,10 @@
+[server]
+# Enable custom modules to be imported when running in Streamlit Cloud
+enableXsrfProtection = false
+enableCORS = false
+
+[theme]
+primaryColor = "#4a6fa5"
+backgroundColor = "#f8f9fa"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#343a40"
