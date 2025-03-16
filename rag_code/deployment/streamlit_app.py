@@ -12,16 +12,36 @@ from pathlib import Path
 import tempfile
 import time
 
-# Add the project root to the Python path
-project_root = Path(__file__).parent.parent
-sys.path.append(str(project_root))
-
-# Import the RAG assistant
-from rag_code.rag_assistant import RAGWritingAssistant
-
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# Get the absolute path to the project root (the directory containing rag_code/)
+current_file_path = Path(__file__).resolve()
+project_root = current_file_path.parent.parent.parent  # Adjust this based on your file location
+
+# Add the project root to the Python path
+sys.path.append(str(project_root))
+
+# Print debug information to help troubleshoot
+logger.info(f"Current file path: {current_file_path}")
+logger.info(f"Project root path: {project_root}")
+logger.info(f"Python path: {sys.path}")
+logger.info(f"Directory contents of project root: {os.listdir(project_root)}")
+
+# Now try to import the RAG assistant
+try:
+    from rag_code.rag_assistant import RAGWritingAssistant
+    logger.info("Successfully imported RAGWritingAssistant")
+except ImportError as e:
+    logger.error(f"Failed to import RAGWritingAssistant: {str(e)}")
+    # Try an alternative import approach
+    try:
+        sys.path.append(str(current_file_path.parent.parent))
+        from rag_assistant import RAGWritingAssistant
+        logger.info("Successfully imported RAGWritingAssistant using alternative path")
+    except ImportError as e2:
+        logger.error(f"Alternative import also failed: {str(e2)}")
 
 # Constants
 DEFAULT_CORPUS_DIR = os.path.join(project_root, "corpus")
