@@ -17,7 +17,7 @@ project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
 
 # Import the RAG assistant
-import sys; sys.path.append('/mount/src/manus_rag_writing'); from code.rag_assistant import RAGWritingAssistant
+from rag_code.rag_assistant import RAGWritingAssistant
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
