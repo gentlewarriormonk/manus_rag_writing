@@ -4,6 +4,7 @@
 streamlit==1.32.0
 langchain==0.3.20
 langchain-openai==0.3.8
+langchain-anthropic==0.1.4
 openai==1.66.3
 anthropic==0.49.0
 tiktoken==0.9.0
