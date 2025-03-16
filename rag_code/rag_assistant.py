@@ -9,14 +9,42 @@ import os
 import logging
 from typing import List, Dict, Any, Optional
 import json
-
-from corpus_ingestion.text_processor import TextProcessor
-from vector_db.vector_store import VectorStore
-from language_model.language_model import LanguageModelIntegration
+import sys
+from pathlib import Path
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# Try different import strategies
+try:
+    from rag_code.corpus_ingestion.text_processor import TextProcessor
+    from rag_code.vector_db.vector_store import VectorStore
+    from rag_code.language_model.language_model import LanguageModelIntegration
+    logger.info("Successfully imported from rag_code package")
+except ImportError as e:
+    logger.warning(f"First import attempt failed: {e}")
+    try:
+        # Try relative imports
+        from .corpus_ingestion.text_processor import TextProcessor
+        from .vector_db.vector_store import VectorStore
+        from .language_model.language_model import LanguageModelIntegration
+        logger.info("Successfully imported using relative imports")
+    except ImportError as e2:
+        logger.warning(f"Second import attempt failed: {e2}")
+        try:
+            # Try a more direct approach
+            current_dir = Path(__file__).parent
+            sys.path.insert(0, str(current_dir))
+            from corpus_ingestion.text_processor import TextProcessor
+            from vector_db.vector_store import VectorStore
+            from language_model.language_model import LanguageModelIntegration
+            logger.info("Successfully imported using direct path")
+        except ImportError as e3:
+            logger.error(f"All import attempts failed: {e3}")
+            logger.error(f"Current directory: {os.getcwd()}")
+            logger.error(f"sys.path: {sys.path}")
+            raise ImportError("Could not import required modules. Please check your Python path configuration.")
 
 class RAGWritingAssistant:
     """
